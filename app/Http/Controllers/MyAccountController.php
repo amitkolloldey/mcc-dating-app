@@ -33,8 +33,9 @@ class MyAccountController extends Controller
     {
         list($my_likes, $my_dislikes) = $this->myLikesDislikes();
 
-        // ROUTE MODEL BINDING WAS NOT WORKING HERE
-        $user = User::where('username', $username)->first();
+        $user = User::with('setting')
+            ->where('username', $username)
+            ->first();;
         if (!$user) {
             abort('404');
         }
@@ -42,7 +43,7 @@ class MyAccountController extends Controller
         $show_publicly = 0;
 
         if (isset($user->setting) && count($user->setting)) {
-            $show_publicly = $user->setting()->first()->show_publicly;
+            $show_publicly = $user->setting[0]->show_publicly;
         }
 
         if (!Auth::check() && ($show_publicly !== 1)) {
